@@ -1,0 +1,104 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+:root {
+    --background-color: #FFFFFF;
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 16px;
+    --padding-sm: 0.5rem;
+    --padding-md: 1rem;
+    --padding-lg: 3rem;
+    --margin-sm: 0.5rem;
+    --margin-md: 1rem;
+    --margin-lg: 3rem;
+}
+
+body {
+    accent-color: var(--background-color);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+ul {
+    padding-left: var(--padding-md);
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 90%;
+    width: 100%;
+    padding-top: var(--padding-lg);
+}
+
+nav h2 {
+    font-size: 1.75em;
+}
+
+nav h3 {
+    display: inline-block;
+    justify-content: center;
+    margin-bottom: var(--margin-lg);
+    color: white;
+    background-color: #A3233B;
+    font-size: 16px;
+    border-radius: 36px;
+    padding: 2.5% 5%;
+    letter-spacing: 3px;
+}
+
+nav ul {
+    border-left: #808080 dashed;
+    padding-left: 0;
+}
+
+nav {
+    flex-basis: 20%;
+    display: flex;
+    flex-direction: column;
+    padding-left: 5%;
+}
+
+nav li {
+    margin-left: var(--margin-md);
+    margin-top: var(--margin-md);
+    
+}
+
+nav li::marker {
+    color: #808080;
+    font-size: 1.54rem;
+}
+
+nav a {
+    text-decoration: none;
+    color: #808080
+}
+
+nav a:hover {
+    color: black
+}
+
+nav .selected a {
+    font-size: 1.25rem;
+    color: black
+}
+
+nav .selected::marker{
+    color: black;
+}
+
+main {
+    display: flex;
+    flex-direction: row;
+    flex-basis: 80%;
+}
+
+header {
+    width: 100%;
+}
