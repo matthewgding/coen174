@@ -17,7 +17,13 @@
     margin: var(--margin-sm) 0;
 }
 
-.selected-course-list {
+.search-course-list {
+    overflow-y: auto;
+}
+
+.selected-course-list-wrapper {
+    display: flex;
+    flex-direction: column;
     flex-basis: 50%;
     background-color: #eeeeee;
     margin: var(--margin-sm);
@@ -25,8 +31,8 @@
     padding: var(--padding-md);
 }
 
-.course-name {
-    font-weight: bold;
+.selected-course-list {
+    overflow-y: auto;
 }
 
 .course-card {

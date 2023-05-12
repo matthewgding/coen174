@@ -7,7 +7,6 @@
     <title>SCU Course Scheduler</title>
     <link rel="stylesheet" href="./assets/css/styles.css">
     <link rel="stylesheet" href="./assets/css/search.css">
-    <script src="./assets/js/script.js" defer></script>
 </head>
 <body>
     <section class="wrapper">
@@ -30,19 +29,23 @@
                     <input id="search-input" type="search" placeholder="ex. COEN 122">
                 </div>
                 
-                    <div class="search-course-list">
-                        <template>
-                            <div class="course-card">
-                                <button class="add-button">+</button>
-                            </div>
-                        </template>
-                    </div>
+                <div class="search-course-list">
+                    <template>
+                        <div class="course-card">
+                            <button class="add-button">+</button>
+                        </div>
+                    </template>
+                </div>
             </div>
-            <div class="selected-course-list">
+            <div class="selected-course-list-wrapper">
                 <h3>Courses Selected</h3>
+                <div class="selected-course-list">
+                    
+                </div>
             </div>
         </main>
     </section>
 
+    <script type="text/javascript" src="./assets/js/search.js"></script>
 </body>
 </html>
