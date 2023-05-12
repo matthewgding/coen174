@@ -15,7 +15,7 @@ main {
     display: flex;
     flex-direction: row;
     width: 100%;
-    padding: var(--padding-sm) var(--padding-md);
+    padding: var(--padding-sm) var(--padding-lg) var(--padding-sm) var(--padding-md);
     overflow-y: auto;
     align-items: start;
 }
