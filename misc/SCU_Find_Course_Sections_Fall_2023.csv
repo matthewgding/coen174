@@ -1,4 +1,4 @@
-courseSection,courseName,instructor,units,days,startTimes,endTimes,location
+courseSection,courseName,instructor,units,days,startTime,endTime,location
 POLI 1,Introduction to U.S. Politics,Anne Baker,4,T Th,10:20 AM,12:00 PM,Rm 212 Kenna Hall
 POLI 1,Introduction to U.S. Politics,,4,M W F,2:15 PM,3:20 PM,Rm 212 Kenna Hall
 POLI 1,Introduction to U.S. Politics,Matthew Harrigan,4,M W F,1:00 PM,2:05 PM,Rm 214 Kenna Hall
