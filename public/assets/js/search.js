@@ -27,7 +27,9 @@ function populateSearchCourseList() {
             const courseCard = createCourseCard(course);
             searchListElement.appendChild(courseCard);
             searchList.push({
-                name: course.courseSection + " - " + course.courseName, 
+                section: course.courseSection,
+                name: course.courseName,
+                fullName: course.courseSection + " - " + course.courseName, 
                 isSelected: false, 
                 element: courseCard
             });
@@ -75,7 +77,7 @@ function createCourseAddButton() {
         const courseDiv = courseButton.parentElement.firstChild;
         const courseName = courseDiv.querySelector(".course-name").textContent;
         searchList.forEach(listCourse => {
-            if (listCourse.name === courseName) {
+            if (listCourse.fullName === courseName) {
                 if (listCourse.isSelected == false) {
                     courseButton.textContent = "Remove";
                     addSelectedCourse(listCourse);
@@ -100,9 +102,10 @@ function addSelectedCourse(listCourse) {
 function removeSelectedCourse(listCourse) {
     listCourse.isSelected = false;
     selectedCourses.forEach(selectedCourse => {
-        if (selectedCourse.name === listCourse.name) {
+        if (selectedCourse.fullName === listCourse.fullName) {
             const index = selectedCourses.indexOf(selectedCourse);
             selectedCourses.splice(index, 1);
+            selectedCourse.isSelected = false;
             addSearchCourse(selectedCourse);
         }
     })
@@ -122,7 +125,8 @@ function implementSearchBar() {
         const value = e.target.value.toLowerCase();
         console.log(value);
         searchList.forEach(listCourse => {
-            const isVisible = listCourse.name.toLowerCase().includes(value);
+            let isVisible = listCourse.fullName.toLowerCase().includes(value);
+            if (listCourse.isSelected) isVisible = true;
             listCourse.element.classList.toggle("hide", !isVisible);
         })
     });
