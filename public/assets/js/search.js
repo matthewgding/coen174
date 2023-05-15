@@ -2,7 +2,6 @@ let courses = [];
 let searchList = [];
 let searchListCourseSections = [];
 let selectedCourses = [];
-const csvFile = "SCU_Find_Course_Sections_Fall_2023.csv";
 
 async function csvFileToJSON(csv) {
     const response = await fetch(csv);
@@ -131,6 +130,7 @@ function implementSearchBar() {
 
 // Implementation
 async function main() {
+    const csvFile = "../../misc/SCU_Find_Course_Sections_Fall_2023.csv";
     courses = await csvFileToJSON(csvFile);
     console.log(courses);
     implementSearchBar();
