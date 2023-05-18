@@ -16,6 +16,8 @@ To install the project, navigate to the project's GitHub repository. At the top 
 
 To use the website, simply open the search.html file in a web browser. This can be done by double clicking on the search.html file within the project folder, which will automatically open it in your default web browser.
 
+To run tests, open the project in a code editor and open a new terminal. In the terminal, run "npm test", and the test files will automatically run and display a report containing the test results.
+
 ## Features
 
 - Search Courses: All available courses for the upcoming are displayed and the user can search for specific courses by name.
