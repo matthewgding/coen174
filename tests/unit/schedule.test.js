@@ -16,8 +16,6 @@ const {
       const expectedOutput = 8;
       expect(convertMilitaryTimeToDecimal(input)).toBe(expectedOutput);
     });
-  
-    // Add more separate test cases as needed
   });
   
   describe('convertStandardTimeToMilitaryTime', () => {
@@ -32,8 +30,6 @@ const {
       const expectedOutput = 1145;
       expect(convertStandardTimeToMilitaryTime(input)).toBe(expectedOutput);
     });
-  
-    // Add more separate test cases as needed
   });
   
   describe('convertMinutesToDecimal', () => {
@@ -48,7 +44,5 @@ const {
       const expectedOutput = 0.25;
       expect(convertMinutesToDecimal(input)).toBe(expectedOutput);
     });
-  
-    // Add more separate test cases as needed
   });
   
