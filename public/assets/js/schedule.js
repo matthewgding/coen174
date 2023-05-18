@@ -171,11 +171,18 @@ async function main() {
         endTime: "3:30 PM",
         location: "O'Connor Hall 204"
     }
-
-    const courses = await csvFileToJSON("../../misc/SCU_Find_Course_Sections_Fall_2023.csv");
-    const test = await [courses[0], courses[1], courses[2], courses[35]];
     console.log(test);
-    populateSchedule(test);
+
+    console.log(courses);
+    console.log(selectedCourses);
+    // const testCourses = await [courses[0], courses[1], courses[2], courses[35]];
+    // populateSchedule(testCourses);
 }
 
 main();
+
+module.exports = {
+    convertMilitaryTimeToDecimal,
+    convertStandardTimeToMilitaryTime,
+    convertMinutesToDecimal
+  };
