@@ -1,0 +1,25 @@
+{
+  "name": "coen174",
+  "version": "1.0.0",
+  "description": "A website where SCU undergraduate students can input the classes they want to take for the upcoming quarter, and the website will display all possible schedules without time conflicts for the student to choose from.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matthewgding/coen174.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matthewgding/coen174/issues"
+  },
+  "homepage": "https://github.com/matthewgding/coen174#readme",
+  "devDependencies": {
+    "jest": "^29.5.0"
+  }
+}
