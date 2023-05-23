@@ -20,10 +20,11 @@ function print(courses) {
     // entries being indices
     let arr = new Array(n);
     for (let i = 0; i < n; i++) {
-        arr[i] = new Array(courses[i].length);
-        for (let j = 0; j < courses[i].length; j++) {
-            courses[i][j] = j;
+        let temp = new Array(courses[i].length);
+        for (let j = 0; j < temp.length; j++) {
+            temp[j] = j;
         }
+        arr[i] = temp;
     }
 
     // To keep track of next element in
@@ -37,12 +38,13 @@ function print(courses) {
     let comboIndex = 0;
     while (true)
     {
-        combinations.push(new Array());
+        let combo = new Array(n);
 
         // Add current combination
         for(let i = 0; i < n; i++)
-            combinations[comboIndex].push(arr[i][indices[i]]);
+            combo[i] = (arr[i][indices[i]]);
 
+        combinations[comboIndex] = combo;
         comboIndex++;
 
         // Find the rightmost array that has more
