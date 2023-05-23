@@ -19,14 +19,14 @@ async function csvFileToJSON(csv) {
 
 // courses is an array of the course object
 function populateSchedule(courses) {
+    clearSchedule();
+    console.log("populating", courses);
     for (let i = 0; i < courses.length; i++) {
         populateScheduleBlock(courses[i]);
     }
 }
 
 function populateScheduleBlock(course) {
-    console.log("populatescheduleblock");
-    console.log("course", course);
     const scheduleBlockDiv = createScheduleBlockDiv(course);
     console.log(scheduleBlockDiv);
     const daysArray = course.days.split(" ");
@@ -52,6 +52,14 @@ function populateScheduleBlock(course) {
     } 
 }
 
+function clearSchedule() {
+    getDayDiv("monday").innerHTML = '';
+    getDayDiv("tuesday").innerHTML = '';
+    getDayDiv("wednesday").innerHTML = '';
+    getDayDiv("thursday").innerHTML = '';
+    getDayDiv("friday").innerHTML = '';
+}
+
 function getDayDiv(weekdayId) {
     const dayDiv = document.querySelector("#" + weekdayId);
     return dayDiv;
@@ -60,7 +68,8 @@ function getDayDiv(weekdayId) {
 function createScheduleBlockDiv(course) {
     const div = document.createElement("div");
     div.classList.add("course");
-    const sectionParagraph = createParagraphElement(course.courseSection);
+    const courseSection = course.name.split(" - ")[0]
+    const sectionParagraph = createParagraphElement(courseSection);
     sectionParagraph.style.fontWeight = "bold";
     const instructorParagraph = createParagraphElement(course.instructor);
     const locationParagraph = createParagraphElement(course.location);
@@ -143,11 +152,129 @@ function convertMinutesToDecimal(minutes) {
     return (minutes / 60.0);
 }
 
-console.log(convertStandardTimeToMilitaryTime("10:20 AM"));
-console.log(convertStandardTimeToMilitaryTime("12:20 PM"));
-console.log(convertStandardTimeToMilitaryTime("1:49 PM"));
-console.log(convertStandardTimeToMilitaryTime("11:05 PM"));
-console.log(convertStandardTimeToMilitaryTime("12:20 AM"));
+function getSelectedCoursesSections(selectedCoursesData) {
+    let selectedCoursesSections = [];
+    for (let i = 0; i < selectedCoursesData.length; ++i) {
+        selectedCoursesSections.push(selectedCoursesData[i].sections);
+    }
+    return selectedCoursesSections;
+}
+
+function getAllCombinations(array2D) {
+    const indexCombinations = getIndexCombinations(array2D);
+    console.log("indexcombos", indexCombinations);
+    let allCombinations = [];
+    for (let i = 0; i < indexCombinations.length; i++) {
+        const indexCombination = indexCombinations[i];
+        let combination = [];
+        for (let row = 0; row < indexCombination.length; row++) {
+            const index = indexCombination[row];
+            combination.push(array2D[row][index]);
+        }
+        allCombinations.push(combination);
+    }
+    return allCombinations;
+}
+
+// Function to generate array of combinations that
+// contain indices representing one element from
+// each of the given arrays of objects
+function getIndexCombinations(array2D) {
+    // Array of resulting combinations
+    let combinations = new Array();
+
+    // Number of arrays
+    let n = array2D.length;
+
+    // Create array parralel to courses with data
+    // entries being indices
+    let arr = new Array(n);
+    for (let i = 0; i < n; i++) {
+        let temp = new Array(array2D[i].length);
+        for (let j = 0; j < temp.length; j++) {
+            temp[j] = j;
+        }
+        arr[i] = temp;
+    }
+
+    // To keep track of next element in
+    // each of the n arrays
+    let indices = new Array(n);
+
+    // Initialize with first element's index
+    for(let i = 0; i < n; i++)
+        indices[i] = 0;
+
+    let comboIndex = 0;
+    while (true)
+    {
+        let combo = new Array(n);
+
+        // Add current combination
+        for(let i = 0; i < n; i++)
+            combo[i] = (arr[i][indices[i]]);
+
+        combinations[comboIndex] = combo;
+        comboIndex++;
+
+        // Find the rightmost array that has more
+        // elements left after the current element
+        // in that array
+        let next = n - 1;
+        while (next >= 0 && (indices[next] + 1 >=
+            arr[next].length))
+            next--;
+
+        // No such array is found so no more
+        // combinations left
+        if (next < 0)
+            break;
+
+        // If found move to next element in that
+        // array
+        indices[next]++;
+
+        // For all arrays to the right of this
+        // array current index again points to
+        // first element
+        for(let i = next + 1; i < n; i++)
+            indices[i] = 0;
+    }
+    return combinations;
+}
+
+let scheduleIndex = 1;
+function initializeScrollingCounter(schedules) {
+    const total = schedules.length;
+    const paragraphElement = document.querySelector(".schedule-counter");
+    paragraphElement.innerHTML = '';
+    const text = scheduleIndex + " / " + total;
+    const textNode = document.createTextNode(text);
+    paragraphElement.appendChild(textNode);
+}
+
+function implementScrollingButtons(schedules) {
+    const total = schedules.length;
+    const paragraphElement = document.querySelector(".schedule-counter");
+    const leftButton = document.querySelector(".left-btn");
+    leftButton.addEventListener('click', () => {
+        if (--scheduleIndex == 0) scheduleIndex = total;
+        populateSchedule(schedules[scheduleIndex-1]);
+        paragraphElement.innerHTML = '';
+        const text = scheduleIndex + " / " + total;
+        const textNode = document.createTextNode(text);
+        paragraphElement.appendChild(textNode);
+    })
+    const rightButton = document.querySelector(".right-btn");
+    rightButton.addEventListener('click', () => {
+        if (++scheduleIndex == total+1) scheduleIndex = 1;
+        populateSchedule(schedules[scheduleIndex-1]);
+        paragraphElement.innerHTML = '';
+        const text = scheduleIndex + " / " + total;
+        const textNode = document.createTextNode(text);
+        paragraphElement.appendChild(textNode);
+    })
+}
 
 // Implementation
 async function main() {
@@ -171,12 +298,22 @@ async function main() {
         endTime: "3:30 PM",
         location: "O'Connor Hall 204"
     }
-    console.log(test);
-
-    console.log(courses);
-    console.log(selectedCourses);
+    // const csvFile = "../../misc/SCU_Find_Course_Sections_Fall_2023.csv";
+    // courses = await csvFileToJSON(csvFile);
+    // console.log(courses);
     // const testCourses = await [courses[0], courses[1], courses[2], courses[35]];
     // populateSchedule(testCourses);
+
+    await connectToDatabase();
+    const selectedCoursesData = await getAllObjectStoreData('selected');
+    const selectedCoursesSections = getSelectedCoursesSections(selectedCoursesData);
+    const scheduleCombinations = getAllCombinations(selectedCoursesSections);
+    populateSchedule(scheduleCombinations[0]);
+    console.log("selected course data", selectedCoursesData);
+    console.log("selected course sections", selectedCoursesSections);
+    console.log("all schedule combinations", scheduleCombinations);
+    initializeScrollingCounter(scheduleCombinations);
+    implementScrollingButtons(scheduleCombinations);
 }
 
 main();
@@ -185,4 +322,5 @@ module.exports = {
     convertMilitaryTimeToDecimal,
     convertStandardTimeToMilitaryTime,
     convertMinutesToDecimal
-  };
+};
+  
