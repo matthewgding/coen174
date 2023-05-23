@@ -1,10 +1,13 @@
-let courses = [];
+let selectedCoursesList = [];
 let searchList = [];
-let searchListCourseSections = [];
-let selectedCourses = [];
 
-async function csvFileToJSON(csv) {
-    const response = await fetch(csv);
+async function isCoursesDataUploaded() {
+    const objectStoreCourses = await getAllObjectStoreData('courses');
+    return !(objectStoreCourses.length === 0);
+}
+
+async function csvFileToJSON(csvFile) {
+    const response = await fetch(csvFile);
     const data = await response.text();
     const lines = data.split("\n");
     const headers = lines[0].split(",");
@@ -20,21 +23,83 @@ async function csvFileToJSON(csv) {
     return result;
 }
 
-function populateSearchCourseList() {
+async function uploadCoursesData() {
+    const csvFile = "../../misc/SCU_Find_Course_Sections_Fall_2023.csv"
+    const coursesJSON = await csvFileToJSON(csvFile);
+
+    const transaction = db.transaction('courses', 'readwrite');
+    const objectStore = transaction.objectStore('courses');
+  
+    for (let i = 0; i < coursesJSON.length; ++i) {
+      const course = coursesJSON[i];
+      await updateCourseData(course, objectStore);
+    }
+}
+  
+async function updateCourseData(course, objectStore) {
+    return new Promise((resolve, reject) => {
+        const getRequest = objectStore.get(course.name);
+
+        getRequest.onsuccess = async function(event) {
+            const existingValue = event.target.result;
+            if (existingValue) {
+                let newSections = existingValue.sections;
+                newSections.push(course);
+                const newObject = {
+                    name: course.name,
+                    sections: newSections
+                };
+                const putObject = await objectStore.put(newObject, course.name);
+                resolve();
+            } else {
+                const sections = [course];
+                const newObject = {
+                    name: course.name,
+                    sections: sections
+                };
+                const putObject = await objectStore.put(newObject, course.name);
+                resolve();
+            }
+        };
+
+        getRequest.onerror = function(event) {
+            console.error('Failed to retrieve existing data:', event.target.errorCode);
+            reject(new Error('Failed to retrieve existing data'));
+        };
+    });
+}
+
+function getAllObjectStoreData(objectStoreName) {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(objectStoreName, 'readonly');
+      const objectStore = transaction.objectStore(objectStoreName);
+      const getAllRequest = objectStore.getAll();
+  
+      getAllRequest.onsuccess = function(event) {
+        const allData = event.target.result;
+        console.log("All data retrieved:", allData);
+        resolve(allData);
+      };
+  
+      getAllRequest.onerror = function(event) {
+        console.error('Failed to retrieve data:', event.target.errorCode);
+        reject(new Error('Failed to retrieve data'));
+      };
+    });
+}
+
+// Courses is an array of objects in form of {name: __, sections: [...]}
+async function populateSearchCourseList() {
+    const objectStoreCourses = await getAllObjectStoreData('courses');
     const searchListElement = document.querySelector(".search-course-list");
-    courses.forEach(course => {
-        if (!searchListCourseSections.includes(course.courseSection)) {
-            const courseCard = createCourseCard(course);
-            searchListElement.appendChild(courseCard);
-            searchList.push({
-                section: course.courseSection,
-                name: course.courseName,
-                fullName: course.courseSection + " - " + course.courseName, 
-                isSelected: false, 
-                element: courseCard
-            });
-            searchListCourseSections.push(course.courseSection);
-        }
+    objectStoreCourses.forEach(course => {
+        const courseCard = createCourseCard(course);
+        searchListElement.appendChild(courseCard);
+        searchList.push({
+            name: course.name,
+            isSelected: false, 
+            element: courseCard
+        });
     })
     console.log(searchList);
 }
@@ -55,7 +120,7 @@ function createCourseCard(course) {
 function createCourseDiv(course) {
     const courseDiv = document.createElement("div");
     courseDiv.classList.add("search-course");
-    courseDiv.appendChild(createCourseParagraph("course-name", course.courseSection + " - " + course.courseName));
+    courseDiv.appendChild(createCourseParagraph("course-name", course.name));
     return courseDiv;
 }
 
@@ -76,14 +141,15 @@ function createCourseAddButton() {
     courseButton.addEventListener("click", () => {
         const courseDiv = courseButton.parentElement.firstChild;
         const courseName = courseDiv.querySelector(".course-name").textContent;
-        searchList.forEach(listCourse => {
-            if (listCourse.fullName === courseName) {
+        searchList.forEach(async listCourse => {
+            if (listCourse.name === courseName) {
                 if (listCourse.isSelected == false) {
-                    courseButton.textContent = "Remove";
                     addSelectedCourse(listCourse);
+                    await uploadSelectedCourse(listCourse);
                 } else {
                     courseButton.textContent = "Add";
                     removeSelectedCourse(listCourse);
+                    deleteSelectedCourse(listCourse);
                 }
             }
         })
@@ -91,20 +157,28 @@ function createCourseAddButton() {
     return courseButton;
 }
 
-function addSelectedCourse(listCourse) {
-    if (!selectedCourses.includes(listCourse)) {
-        listCourse.isSelected = true;
-        selectedCourses.push(listCourse);
-        populateSelectedCourseList();
-    }
+async function addSelectedCourse(listCourse) {
+    listCourse.element.querySelector(".add-button").textContent = "Remove";
+    listCourse.isSelected = true;
+    selectedCoursesList.push(listCourse);
+    populateSelectedCourseList();
+}
+
+async function uploadSelectedCourse(listCourse) {
+    const courseData = await getObjectByKey("courses", listCourse.name);
+    console.log("coursedata", courseData);
+    const transaction = db.transaction('selected', 'readwrite');
+    const objectStore = transaction.objectStore('selected');
+    await objectStore.put(courseData, courseData.name);
+    console.log(await getAllObjectStoreData('selected'));
 }
 
 function removeSelectedCourse(listCourse) {
     listCourse.isSelected = false;
-    selectedCourses.forEach(selectedCourse => {
-        if (selectedCourse.fullName === listCourse.fullName) {
-            const index = selectedCourses.indexOf(selectedCourse);
-            selectedCourses.splice(index, 1);
+    selectedCoursesList.forEach(selectedCourse => {
+        if (selectedCourse.name === listCourse.name) {
+            const index = selectedCoursesList.indexOf(selectedCourse);
+            selectedCoursesList.splice(index, 1);
             selectedCourse.isSelected = false;
             addSearchCourse(selectedCourse);
         }
@@ -112,10 +186,35 @@ function removeSelectedCourse(listCourse) {
     populateSelectedCourseList();
 }
 
+async function deleteSelectedCourse(listCourse) {
+    const transaction = db.transaction('selected', 'readwrite');
+    const objectStore = transaction.objectStore('selected');
+    objectStore.delete(listCourse.name);
+    console.log(await getAllObjectStoreData('selected'));
+}
+
+function getObjectByKey(objectStoreName, key) {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(objectStoreName, 'readonly');
+      const objectStore = transaction.objectStore(objectStoreName);
+      const getRequest = objectStore.get(key);
+  
+      getRequest.onsuccess = function(event) {
+        const result = event.target.result;
+        resolve(result);
+      };
+  
+      getRequest.onerror = function(event) {
+        console.error('Failed to retrieve object:', event.target.errorCode);
+        reject(new Error('Failed to retrieve object'));
+      };
+    });
+  }
+
 function populateSelectedCourseList() {
-    const selectedCoursesList = document.querySelector(".selected-course-list");
-    selectedCourses.forEach(selectedCourse => {
-        selectedCoursesList.appendChild(selectedCourse.element);
+    const selectedCoursesListElement = document.querySelector(".selected-course-list");
+    selectedCoursesList.forEach(selectedCourse => {
+        selectedCoursesListElement.appendChild(selectedCourse.element);
     });
 }
 
@@ -125,20 +224,45 @@ function implementSearchBar() {
         const value = e.target.value.toLowerCase();
         console.log(value);
         searchList.forEach(listCourse => {
-            let isVisible = listCourse.fullName.toLowerCase().includes(value);
+            let isVisible = listCourse.name.toLowerCase().includes(value);
             if (listCourse.isSelected) isVisible = true;
             listCourse.element.classList.toggle("hide", !isVisible);
         })
     });
 }
 
-// Implementation
-async function main() {
-    const csvFile = "../../misc/SCU_Find_Course_Sections_Fall_2023.csv";
-    courses = await csvFileToJSON(csvFile);
-    console.log(courses);
-    implementSearchBar();
-    populateSearchCourseList();
+async function initializeSelectedCoursesList() {
+    const selectedCoursesData = await getAllObjectStoreData('selected');
+    selectedCoursesData.forEach(selectedCourse => {
+        const name = selectedCourse.name;
+        console.log("name", name);
+        const listCourse = findListCourse(name);
+        console.log("found list course", listCourse);
+        addSelectedCourse(listCourse);
+    })
 }
 
+function findListCourse(name) {
+    console.log("search list", searchList);
+    const foundCourse = searchList.find(listCourse => listCourse.name === name);
+    if (foundCourse) {
+      console.log("FOUND");
+      console.log("listcourse", foundCourse);
+      return foundCourse;
+    }
+    return null; // Return null if the course is not found
+  }
+
+// Implementation
+async function main() {
+    await connectToDatabase();
+    if (!(await isCoursesDataUploaded())) {
+        console.log("populating courses");
+        await uploadCoursesData();
+    }
+    implementSearchBar();
+    await populateSearchCourseList();
+    initializeSelectedCoursesList();
+    console.log("closed");
+}
 main();
