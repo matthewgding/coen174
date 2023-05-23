@@ -46,3 +46,22 @@ async function connectToDatabase() {
         };
     });
 }
+
+function getAllObjectStoreData(objectStoreName) {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(objectStoreName, 'readonly');
+      const objectStore = transaction.objectStore(objectStoreName);
+      const getAllRequest = objectStore.getAll();
+  
+      getAllRequest.onsuccess = function(event) {
+        const allData = event.target.result;
+        console.log("All data retrieved:", allData);
+        resolve(allData);
+      };
+  
+      getAllRequest.onerror = function(event) {
+        console.error('Failed to retrieve data:', event.target.errorCode);
+        reject(new Error('Failed to retrieve data'));
+      };
+    });
+}
