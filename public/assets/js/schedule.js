@@ -20,7 +20,6 @@ async function csvFileToJSON(csv) {
 // courses is an array of the course object
 function populateSchedule(courses) {
     clearSchedule();
-    console.log("populating", courses);
     for (let i = 0; i < courses.length; i++) {
         populateScheduleBlock(courses[i]);
     }
@@ -28,7 +27,6 @@ function populateSchedule(courses) {
 
 function populateScheduleBlock(course) {
     const scheduleBlockDiv = createScheduleBlockDiv(course);
-    console.log(scheduleBlockDiv);
     const daysArray = course.days.split(" ");
     if (daysArray.includes("M")) {
         const dayDiv = getDayDiv("monday");
@@ -71,11 +69,14 @@ function createScheduleBlockDiv(course) {
     const courseSection = course.name.split(" - ")[0]
     const sectionParagraph = createParagraphElement(courseSection);
     sectionParagraph.style.fontWeight = "bold";
+    const timeRange = course.startTime + " - " + course.endTime;
+    const timeParagraph = createParagraphElement(timeRange);
     const instructorParagraph = createParagraphElement(course.instructor);
-    const locationParagraph = createParagraphElement(course.location);
+    //const locationParagraph = createParagraphElement(course.location);
     div.appendChild(sectionParagraph);
+    div.appendChild(timeParagraph);
     div.appendChild(instructorParagraph);
-    div.appendChild(locationParagraph);
+    //div.appendChild(locationParagraph);
 
     const height = getScheduleBlockHeight(course) + "px";
     const topPadding = getScheduleBlockPadding(course) + "px";
@@ -93,7 +94,6 @@ function createParagraphElement(text) {
 }
 
 function getScheduleBlockHeight(course) {
-    console.log("course", course);
     const timeDifference = getTimeDifference(course.startTime, course.endTime);
     return (timeDifference) * HOUR_BLOCK_HEIGHT;
 } 
@@ -132,7 +132,6 @@ function convertMilitaryTimeToDecimal(militaryTime) {
 
 // Return military time as number
 function convertStandardTimeToMilitaryTime(standardTime) {
-    console.log("time", standardTime);
     const time = standardTime.split(" ")[0];
     let hour = time.split(":")[0];
     const minute = time.split(":")[1];
@@ -276,44 +275,123 @@ function implementScrollingButtons(schedules) {
     })
 }
 
+function getPossibleSchedules(scheduleCombinations) {
+    let possibleSchedules = [];
+    for (let scheduleCombination of scheduleCombinations) {
+        if (!hasConflictingTimes(scheduleCombination)) {
+            possibleSchedules.push(scheduleCombination);
+        }
+    }
+    return possibleSchedules;
+}
+
+
+/* Function to sort courses by their start times. 
+   It prioritizes the start time first, then the day.
+*/
+function sortByStartTime(courses) {
+    return courses.sort((courseA, courseB) => {
+      const timeA = convertStandardTimeToMilitaryTime(courseA.startTime);
+      const timeB = convertStandardTimeToMilitaryTime(courseB.startTime);
+  
+      if (timeA !== timeB) {
+        return timeA - timeB; // Sort by start time
+      } else {
+        const dayOrder = ['M', 'T', 'W', 'Th', 'F']; // Define the order of days
+  
+        const dayA = dayOrder.indexOf(courseA.days[0]);
+        const dayB = dayOrder.indexOf(courseB.days[0]);
+  
+        return dayA - dayB; // Sort by day
+      }
+    });
+}
+
+/* Function to check if there are conflicting times between the courses.
+   First iterates through each day of the week and filters the courses
+   scheduled on that day. 
+   Then sorts the filtered courses by start time.
+   Finally, iterates through the sorted courses to check for time overlaps.
+   Returns true if there is a time conflict and false if not.
+*/
+function hasConflictingTimes(courses) {
+    const daysOfWeek = ['M', 'T', 'W', 'Th', 'F'];
+  
+    for (let day of daysOfWeek) {
+      const coursesOnDay = courses.filter(course => course.days.includes(day));
+  
+      const sortedCourses = coursesOnDay.sort((courseA, courseB) => {
+        const timeA = convertStandardTimeToMilitaryTime(courseA.startTime);
+        const timeB = convertStandardTimeToMilitaryTime(courseB.startTime);
+        return timeA - timeB;
+      });
+  
+      for (let i = 0; i < sortedCourses.length - 1; i++) {
+        const currentCourse = sortedCourses[i];
+        const nextCourse = sortedCourses[i + 1];
+  
+        if (hasTimeOverlap(currentCourse, nextCourse)) {
+          return true; // Conflicting times found
+        }
+      }
+    }
+  
+    return false; // No conflicting times found
+}
+  
+/* Function to check between two courses.
+   First checks if there is a day overlap between the courses.
+   If there is a day overlap, it compares the start and end times 
+   to determine if there is a time overlap.
+   Returns true if there is a time overlap and false or not.
+   This serves as a helper function for hasConflictingTimes.
+*/
+function hasTimeOverlap(courseA, courseB) {
+    const daysA = courseA.days;
+    const daysAArray = daysA.split(" ");
+    const daysB = courseB.days;
+    const daysBArray = daysB.split(" ");
+    const startTimeA = convertStandardTimeToMilitaryTime(courseA.startTime);
+    const endTimeA = convertStandardTimeToMilitaryTime(courseA.endTime);
+    const startTimeB = convertStandardTimeToMilitaryTime(courseB.startTime);
+    const endTimeB = convertStandardTimeToMilitaryTime(courseB.endTime);
+
+    // Check if any of the days overlap
+    const hasDayOverlap = daysAArray.some(day => daysBArray.includes(day));
+  
+    // Check for time overlap if the days overlap
+    if (hasDayOverlap) {
+      return (startTimeA <= endTimeB && endTimeA >= startTimeB);
+    }
+  
+    return false;
+}
+
+function populateSchedules(schedules) {
+    if (schedules.length == 0) {
+
+    }
+}
+
 // Implementation
 async function main() {
-    const course1 = {
-        courseSection: "COEN 10",
-        courseName: "Introduction Comp",
-        instructor: "Chirs Tamayo",
-        units: "4",
-        days: "T Th",
-        startTime: "10:20 AM",
-        endTime: "12:00 PM",
-        location: "Kenna 103"
-    }
-    const course2 = {
-        courseSection: "COEN 79",
-        courseName: "Data Structs",
-        instructor: "Shiv Jhalani",
-        units: "4",
-        days: "M W F",
-        startTime: "2:15 PM",
-        endTime: "3:30 PM",
-        location: "O'Connor Hall 204"
-    }
-    // const csvFile = "../../misc/SCU_Find_Course_Sections_Fall_2023.csv";
-    // courses = await csvFileToJSON(csvFile);
-    // console.log(courses);
-    // const testCourses = await [courses[0], courses[1], courses[2], courses[35]];
-    // populateSchedule(testCourses);
-
     await connectToDatabase();
     const selectedCoursesData = await getAllObjectStoreData('selected');
-    const selectedCoursesSections = getSelectedCoursesSections(selectedCoursesData);
-    const scheduleCombinations = getAllCombinations(selectedCoursesSections);
-    populateSchedule(scheduleCombinations[0]);
     console.log("selected course data", selectedCoursesData);
+
+    const selectedCoursesSections = getSelectedCoursesSections(selectedCoursesData);
     console.log("selected course sections", selectedCoursesSections);
+
+    const scheduleCombinations = getAllCombinations(selectedCoursesSections);
     console.log("all schedule combinations", scheduleCombinations);
-    initializeScrollingCounter(scheduleCombinations);
-    implementScrollingButtons(scheduleCombinations);
+
+    const possibleSchedules = getPossibleSchedules(scheduleCombinations);
+    console.log("possible schedules", possibleSchedules);
+
+    populateSchedules(possibleSchedules);
+    populateSchedule(possibleSchedules[0]);
+    initializeScrollingCounter(possibleSchedules);
+    implementScrollingButtons(possibleSchedules);
 }
 
 main();
