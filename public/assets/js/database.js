@@ -47,6 +47,11 @@ async function connectToDatabase() {
     });
 }
 
+async function isCoursesDataUploaded() {
+    const objectStoreCourses = await getAllObjectStoreData('courses');
+    return !(objectStoreCourses.length === 0);
+}
+
 function getAllObjectStoreData(objectStoreName) {
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(objectStoreName, 'readonly');
@@ -65,3 +70,56 @@ function getAllObjectStoreData(objectStoreName) {
       };
     });
 }
+
+async function uploadCoursesData(coursesJSON) {
+    const transaction = db.transaction('courses', 'readwrite');
+    const objectStore = transaction.objectStore('courses');
+  
+    for (let i = 0; i < coursesJSON.length; ++i) {
+      const course = coursesJSON[i];
+      await updateCourseData(course, objectStore);
+    }
+}
+  
+async function updateCourseData(course, objectStore) {
+    return new Promise((resolve, reject) => {
+        const getRequest = objectStore.get(course.name);
+
+        getRequest.onsuccess = async function(event) {
+            const existingValue = event.target.result;
+            if (existingValue) {
+                let newSections = existingValue.sections;
+                newSections.push(course);
+                const newObject = {
+                    name: course.name,
+                    sections: newSections
+                };
+                const putObject = await objectStore.put(newObject, course.name);
+                resolve();
+            } else {
+                const sections = [course];
+                const newObject = {
+                    name: course.name,
+                    sections: sections
+                };
+                const putObject = await objectStore.put(newObject, course.name);
+                resolve();
+            }
+        };
+
+        getRequest.onerror = function(event) {
+            console.error('Failed to retrieve existing data:', event.target.errorCode);
+            reject(new Error('Failed to retrieve existing data'));
+        };
+    });
+}
+
+async function getSelectedCoursesSections() {
+    const selectedCoursesData = await getAllObjectStoreData('selected');
+    let selectedCoursesSections = [];
+    for (let i = 0; i < selectedCoursesData.length; ++i) {
+        selectedCoursesSections.push(selectedCoursesData[i].sections);
+    }
+    return selectedCoursesSections;
+}
+

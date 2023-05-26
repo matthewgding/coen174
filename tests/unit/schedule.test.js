@@ -2,7 +2,7 @@ const {
     convertMilitaryTimeToDecimal,
     convertStandardTimeToMilitaryTime,
     convertMinutesToDecimal,
-  } = require('../../public/assets/js/schedule');
+  } = require('../../public/assets/js/scheduleBuilder');
   
   describe('convertMilitaryTimeToDecimal', () => {
     test('should convert military time 1430 to decimal 14.5', () => {
