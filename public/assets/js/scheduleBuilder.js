@@ -113,14 +113,6 @@ function getTimeDifference(startTime, endTime) {
     return timeDifference;
 }
 
-function getMinutes(time) {
-    return (time % 100);
-}
-
-function getHours(time) {
-    return parseInt(time / 100);
-}
-
 function getScheduleBlockPadding(course) {
     const militaryStartTime = convertStandardTimeToMilitaryTime(course.startTime);
     const decimalStartTime = convertMilitaryTimeToDecimal(militaryStartTime);
@@ -132,6 +124,18 @@ function convertMilitaryTimeToDecimal(militaryTime) {
     const minute = getMinutes(militaryTime);
     const minuteDecimal = convertMinutesToDecimal(minute);
     return (hour + minuteDecimal);
+}
+
+function getHours(militaryTime) {
+    return parseInt(militaryTime / 100);
+}
+
+function getMinutes(militaryTime) {
+    return (militaryTime % 100);
+}
+
+function convertMinutesToDecimal(minutes) {
+    return (minutes / 60.0);
 }
 
 // Return military time as number
@@ -150,10 +154,6 @@ function convertStandardTimeToMilitaryTime(standardTime) {
 
     return (parseInt(hour) * 100) + parseInt(minute);
 }   
-
-function convertMinutesToDecimal(minutes) {
-    return (minutes / 60.0);
-}
 
 let scheduleIndex = 1;
 function initializeScrollingCounter(schedules) {
@@ -189,6 +189,12 @@ function implementScrollingButtons(schedules) {
 }
 
 module.exports = {
+    HOUR_BLOCK_HEIGHT,
+    getScheduleBlockHeight,
+    getTimeDifference,
+    getMinutes,
+    getHours,
+    getScheduleBlockPadding,
     convertMilitaryTimeToDecimal,
     convertStandardTimeToMilitaryTime,
     convertMinutesToDecimal
