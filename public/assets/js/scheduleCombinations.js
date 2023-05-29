@@ -21,6 +21,7 @@ function getIndexCombinations(array2D) {
     // Array of resulting combinations
     let combinations = new Array();
 
+    if (array2D.length == 0) return combinations;
     // Number of arrays
     let n = array2D.length;
 
@@ -172,4 +173,29 @@ function hasTimeOverlap(courseA, courseB) {
     }
   
     return false;
+}
+
+function convertStandardTimeToMilitaryTime(standardTime) {
+    const time = standardTime.split(" ")[0];
+    let hour = time.split(":")[0];
+    const minute = time.split(":")[1];
+    const meridiem = standardTime.split(" ")[1];    
+
+    if (meridiem === "PM" && hour < 12) {
+        hour = parseInt(hour) + 12;
+    }
+    if (meridiem == "AM" && hour == 12) {
+        hour = 0;
+    }
+
+    return (parseInt(hour) * 100) + parseInt(minute);
+}   
+
+module.exports = {
+    getAllCombinations,
+    getIndexCombinations,
+    getPossibleSchedules,
+    sortByStartTime,
+    hasConflictingTimes,
+    hasTimeOverlap
 }
