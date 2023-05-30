@@ -8,9 +8,13 @@ async function csvFileToJSON(csvFile) {
         const obj = {};
         const currentline = lines[i].split(',');
         for (let j = 0; j < headers.length; j++) {
-            obj[headers[j].trim()] = currentline[j];
+            obj[headers[j].trim()] = currentline[j].trim();
         }
         result.push(obj);
     }
     return result;
+}
+
+module.exports = {
+    csvFileToJSON
 }
