@@ -1,6 +1,5 @@
 function getAllCombinations(array2D) {
     const indexCombinations = getIndexCombinations(array2D);
-    console.log("indexcombos", indexCombinations);
     let allCombinations = [];
     for (let i = 0; i < indexCombinations.length; i++) {
         const indexCombination = indexCombinations[i];
