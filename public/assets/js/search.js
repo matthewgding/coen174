@@ -3,7 +3,7 @@ async function main() {
     await connectToDatabase();
     if (!(await isCoursesDataUploaded())) {
         console.log("populating courses");
-        const csvFile = "../../misc/SCU_Find_Course_Sections_Fall_2023.csv"
+        const csvFile = "misc/SCU_Find_Course_Sections_Fall_2023.csv"
         const coursesJSON = await csvFileToJSON(csvFile);
         await uploadCoursesData(coursesJSON);
     }
