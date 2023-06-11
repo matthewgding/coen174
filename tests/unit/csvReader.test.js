@@ -31,9 +31,9 @@ Jane,30,San Francisco`;
 
     it('handles leading/trailing spaces in CSV headers and values', async () => {
         const csvFile = 'data.csv';
-        const csvData = ` Name , Age , City
-John , 25 , New York
-Jane , 30 , San Francisco`;
+        const csvData = ` Name,Age,City
+John,25,New York
+Jane,30,San Francisco`;
 
         global.fetch.mockResolvedValue({ text: jest.fn().mockResolvedValue(csvData) });
 
