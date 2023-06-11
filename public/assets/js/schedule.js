@@ -1,4 +1,4 @@
-// Implementation
+// Implementation of schedule.html
 async function main() {
     try {
         await connectToDatabase();

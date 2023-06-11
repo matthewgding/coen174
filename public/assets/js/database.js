@@ -1,5 +1,11 @@
 let db; // Declare a global variable to hold the IndexedDB connection
 
+/**
+ * Connects to the indexedDB database 'myDatabase' and handles database creation.
+ *
+ * @returns {Promise<void>} A Promise that resolves when the connection to the database is established successfully.
+ * @throws {Error} If there is an error opening or deleting the database.
+ */
 function connectToDatabase() {
     return new Promise((resolve, reject) => {
 
@@ -48,12 +54,24 @@ function connectToDatabase() {
     });
 }
 
-
+/**
+ * Checks if the 'courses' object store in the database has any data.
+ *
+ * @returns {Promise<boolean>} A Promise that resolves to `true` if there is data in the 'courses' object store, `false` otherwise.
+ * @throws {Error} If there is an error retrieving data from the 'courses' object store.
+ */
 async function isCoursesDataUploaded() {
     const objectStoreCourses = await getAllObjectStoreData('courses');
     return !(objectStoreCourses.length === 0);
 }
 
+/**
+ * Retrieves all data from the specified object store.
+ *
+ * @param {string} objectStoreName - The name of the object store from which to retrieve data.
+ * @returns {Promise<Array<Object>>} A Promise that resolves to an array of objects representing the retrieved data.
+ * @throws {Error} If there is an error retrieving data from the object store.
+ */
 function getAllObjectStoreData(objectStoreName) {
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(objectStoreName, 'readonly');
@@ -73,6 +91,12 @@ function getAllObjectStoreData(objectStoreName) {
     });
 }
 
+/**
+ * Uploads courses data to the 'courses' object store in the database.
+ *
+ * @param {Array<Object>} coursesJSON - An array of course data objects in JSON format to be uploaded.
+ * @returns {Promise<void>} A Promise that resolves when all course data has been uploaded successfully.
+ */
 async function uploadCoursesData(coursesJSON) {
     const transaction = db.transaction('courses', 'readwrite');
     const objectStore = transaction.objectStore('courses');
@@ -83,6 +107,14 @@ async function uploadCoursesData(coursesJSON) {
     }
 }
   
+/**
+ * Updates the data for a specific course in the specified object store.
+ *
+ * @param {Object} course - The course data object to be updated.
+ * @param {IDBObjectStore} objectStore - The object store in which to update the data.
+ * @returns {Promise<void>} A Promise that resolves when the course data has been updated successfully.
+ * @throws {Error} If there is an error retrieving or updating the existing data.
+ */
 async function updateCourseData(course, objectStore) {
     return new Promise((resolve, reject) => {
         const getRequest = objectStore.get(course.name);
@@ -116,6 +148,12 @@ async function updateCourseData(course, objectStore) {
     });
 }
 
+/**
+ * Retrieves all sections of the selected courses from the 'selected' object store.
+ *
+ * @returns {Promise<Array<Array<Object>>>} A Promise that resolves to an array of arrays, where each inner array represents the sections of a selected course.
+ * @throws {Error} If there is an error retrieving data from the 'selected' object store.
+ */
 async function getSelectedCoursesSections() {
     const selectedCoursesData = await getAllObjectStoreData('selected');
     let selectedCoursesSections = [];

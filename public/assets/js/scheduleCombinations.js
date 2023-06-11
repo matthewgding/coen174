@@ -1,3 +1,9 @@
+/**
+ * Generates all possible combinations of elements from a 2D array and returns them as a new array.
+ *
+ * @param {Array<Array>} array2D - The 2D array containing elements for combinations.
+ * @returns {Array<Array>} An array of all possible combinations.
+ */
 function getAllCombinations(array2D) {
     const indexCombinations = getIndexCombinations(array2D);
     let allCombinations = [];
@@ -13,9 +19,12 @@ function getAllCombinations(array2D) {
     return allCombinations;
 }
 
-// Function to generate array of combinations that
-// contain indices representing one element from
-// each of the given arrays of objects
+/**
+ * Generates an array of combinations that contain indices representing one element from each of the given arrays of objects.
+ *
+ * @param {Array<Array>} array2D - The 2D array containing elements for combinations.
+ * @returns {Array<Array>} An array of combinations represented as arrays of indices.
+ */
 function getIndexCombinations(array2D) {
     // Array of resulting combinations
     let combinations = new Array();
@@ -81,7 +90,12 @@ function getIndexCombinations(array2D) {
     return combinations;
 }
 
-
+/**
+ * Filters out combinations with conflicting times from the given array of schedule combinations.
+ *
+ * @param {Array<Array>} scheduleCombinations - The array of schedule combinations to filter.
+ * @returns {Array<Array>} An array of possible schedules without conflicting times.
+ */
 function getPossibleSchedules(scheduleCombinations) {
     let possibleSchedules = [];
     for (let scheduleCombination of scheduleCombinations) {
@@ -174,6 +188,12 @@ function hasTimeOverlap(courseA, courseB) {
     return false;
 }
 
+/**
+ * Converts a standard time string to military time as a number.
+ *
+ * @param {string} standardTime - The standard time string.
+ * @returns {number} The military time as a number.
+ */
 function convertStandardTimeToMilitaryTime(standardTime) {
     const time = standardTime.split(" ")[0];
     let hour = time.split(":")[0];

@@ -1,4 +1,4 @@
-// Implementation
+// Implementation of search.html
 async function main() {
     await connectToDatabase();
     if (!(await isCoursesDataUploaded())) {
