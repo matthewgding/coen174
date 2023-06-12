@@ -14,9 +14,9 @@ To install the project, navigate to the project's GitHub repository. At the top 
 
 ## Usage
 
-To use the website, simply open the search.html file in a web browser. This can be done by double clicking on the search.html file within the project folder, which will automatically open it in your default web browser.
+To use the website, simply open the index.html file in a web browser. This can be done by double clicking on the index.html file within the project folder, which will automatically open it in your default web browser. The project is also accessible at https://matthewgding.github.io/coen174/.
 
-To run tests, open the project in a code editor and open a new terminal. In the terminal, run "npx jest", and the test files will automatically run and display a report containing the test results. If the command fails due to permission issues with "jest", use the command "chmod 755 node_modules/.bin/jest" from the main project directory.
+To run tests, first, ensure Node.js is installed on your computer. It's recommended to download the LTS version at https://nodejs.org/en. Next, open a new terminal and navigate to the project's directory, 'coen174'. In the terminal, run "npx jest --verbose", and the test files will automatically run and display a report containing the test results. If the command fails due to permission issues with "jest", use the command "chmod 755 node_modules/.bin/jest" from the main project directory.
 
 ## Features
 
@@ -30,4 +30,4 @@ Developers:
 - Matthew Ding (mgding@scu.edu)
 - Xiomara Quinonez (xquinonez@scu.edu)
 - Aaron Ancheta (anancheta@scu.edu)
-- Chris Tamayo (ctamayo@sce.edu)
+- Chris Tamayo (ctamayo@scu.edu)
